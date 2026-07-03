@@ -87,23 +87,3 @@ MVVM mapping: **screens/** = View, **providers/** = ViewModel,
 providers never import Flutter widgets — this keeps business logic testable
 and UI swappable.
 
-## Notes for interviews
-
-- `ExpenseRepository.addExpense()` demonstrates the offline-first pattern:
-  writes to Firestore first, falls back to a local Hive queue on failure,
-  and `syncPendingExpenses()` flushes the queue once back online.
-- `app_router.dart`'s `redirect` callback is a clean example of route guarding
-  driven by a Riverpod stream (`authStateProvider`) rather than imperative
-  navigation calls scattered across screens.
-- `AiService` isolates all Gemini prompt engineering in one place, so the
-  categorization, voice-parsing, and advisor features are all one small class
-  to walk through.
-
-## What you still need to do
-
-- Generate `firebase_options.dart` (step 2 above) — not included since it's
-  tied to your specific Firebase project.
-- Add `assets/lottie/*.json` if you want animated splash/empty-states.
-- Wire up `image_picker` + `firebase_storage` upload in `add_expense_screen.dart`
-  for the receipt image field (left as a stretch feature).
-- Add unit/widget tests under `test/` (Phase 12 from the original plan).
