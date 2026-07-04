@@ -8,30 +8,47 @@ import '../network/dio_client.dart';
 /// Store your key securely (e.g. via --dart-define=GEMINI_API_KEY=xxx)
 /// rather than hardcoding it in source.
 class AiService {
-  static const String _apiKey =
-      String.fromEnvironment('GEMINI_API_KEY', defaultValue: '');
+  static const String _apiKey = "Gemini_API_Key";
   static const String _baseUrl =
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
-
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
   final Dio _dio = DioClient.instance;
 
   Future<String> _generate(String prompt) async {
-    final response = await _dio.post(
-      '$_baseUrl?key=$_apiKey',
-      data: {
-        'contents': [
-          {
-            'parts': [
-              {'text': prompt}
-            ]
-          }
-        ],
-        'generationConfig': {'temperature': 0.2},
-      },
-    );
-    final candidates = response.data['candidates'] as List;
-    final text = candidates.first['content']['parts'][0]['text'] as String;
-    return text.trim();
+    try {
+      final response = await _dio.post(
+        _baseUrl,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "X-goog-api-key": _apiKey,
+          },
+        ),
+        data: {
+          'contents': [
+            {
+              'parts': [
+                {'text': prompt}
+              ]
+            }
+          ],
+          'generationConfig': {'temperature': 0.2},
+        },
+      );
+
+      print("========== GEMINI RESPONSE ==========");
+      print(response.data);
+      print("=====================================");
+
+      final candidates = response.data['candidates'] as List;
+      final text = candidates.first['content']['parts'][0]['text'] as String;
+      return text.trim();
+    } on DioException catch (e) {
+      print("========== GEMINI ERROR ==========");
+      print("Status Code: ${e.response?.statusCode}");
+      print("Response: ${e.response?.data}");
+      print("==================================");
+      rethrow;
+    }
   }
 
   /// Classifies free text like "Swiggy 450" into one of our categories.
@@ -69,7 +86,8 @@ Sentence: "$speech"
 ''';
     try {
       final raw = await _generate(prompt);
-      final cleaned = raw.replaceAll('```json', '').replaceAll('```', '').trim();
+      final cleaned =
+          raw.replaceAll('```json', '').replaceAll('```', '').trim();
       return jsonDecode(cleaned) as Map<String, dynamic>;
     } catch (_) {
       return {

@@ -26,11 +26,13 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
 
     if (_query.isNotEmpty) {
       final q = _query.toLowerCase();
-      result = result.where((e) =>
-          e.description.toLowerCase().contains(q) ||
-          e.category.toLowerCase().contains(q) ||
-          e.paymentMethod.toLowerCase().contains(q) ||
-          e.amount.toString().contains(q)).toList();
+      result = result
+          .where((e) =>
+              e.description.toLowerCase().contains(q) ||
+              e.category.toLowerCase().contains(q) ||
+              e.paymentMethod.toLowerCase().contains(q) ||
+              e.amount.toString().contains(q))
+          .toList();
     }
 
     if (_categoryFilter != null) {
@@ -40,24 +42,41 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
     final now = DateTime.now();
     switch (_filter) {
       case DateFilter.today:
-        result = result.where((e) =>
-            e.date.year == now.year && e.date.month == now.month && e.date.day == now.day).toList();
+        result = result
+            .where((e) =>
+                e.date.year == now.year &&
+                e.date.month == now.month &&
+                e.date.day == now.day)
+            .toList();
         break;
       case DateFilter.yesterday:
         final y = now.subtract(const Duration(days: 1));
-        result = result.where((e) =>
-            e.date.year == y.year && e.date.month == y.month && e.date.day == y.day).toList();
+        result = result
+            .where((e) =>
+                e.date.year == y.year &&
+                e.date.month == y.month &&
+                e.date.day == y.day)
+            .toList();
         break;
       case DateFilter.thisWeek:
         final weekStart = now.subtract(Duration(days: now.weekday - 1));
-        result = result.where((e) => e.date.isAfter(weekStart.subtract(const Duration(days: 1)))).toList();
+        result = result
+            .where((e) =>
+                e.date.isAfter(weekStart.subtract(const Duration(days: 1))))
+            .toList();
         break;
       case DateFilter.thisMonth:
-        result = result.where((e) => e.date.month == now.month && e.date.year == now.year).toList();
+        result = result
+            .where((e) => e.date.month == now.month && e.date.year == now.year)
+            .toList();
         break;
       case DateFilter.lastMonth:
         final lastMonth = DateTime(now.year, now.month - 1);
-        result = result.where((e) => e.date.month == lastMonth.month && e.date.year == lastMonth.year).toList();
+        result = result
+            .where((e) =>
+                e.date.month == lastMonth.month &&
+                e.date.year == lastMonth.year)
+            .toList();
         break;
       case DateFilter.all:
         break;
@@ -101,7 +120,7 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
                     label: Text(_filterLabel(f)),
                     selected: selected,
                     onSelected: (_) => setState(() => _filter = f),
-                    selectedColor: AppColors.primary.withOpacity(0.15),
+                    selectedColor: AppColors.primary.withValues(alpha: 0.15),
                   ),
                 );
               }).toList(),
@@ -142,18 +161,23 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
                         margin: const EdgeInsets.only(bottom: 10),
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: AppColors.primary.withOpacity(0.1),
+                            backgroundColor:
+                                AppColors.primary.withValues(alpha: 0.1),
                             child: Icon(CategoryModel.iconFor(e.category),
                                 color: AppColors.primary, size: 20),
                           ),
-                          title: Text(e.description.isEmpty ? e.category : e.description),
+                          title: Text(e.description.isEmpty
+                              ? e.category
+                              : e.description),
                           subtitle: Text(
                               '${e.category} • ${e.paymentMethod} • ${Formatters.date(e.date)}'),
                           trailing: Text(
                             '${e.isIncome ? '+' : '-'}${Formatters.currency(e.amount)}',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: e.isIncome ? AppColors.success : AppColors.error,
+                              color: e.isIncome
+                                  ? AppColors.success
+                                  : AppColors.error,
                             ),
                           ),
                           onTap: () => context.push('/add-expense', extra: e),

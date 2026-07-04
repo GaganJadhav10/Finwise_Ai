@@ -25,7 +25,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final income = ref.watch(monthlyIncomeProvider);
     final expense = ref.watch(monthlyExpenseProvider);
     final balance = income - expense;
-    final recentExpenses = ref.watch(currentMonthExpensesProvider).take(5).toList();
+    final recentExpenses =
+        ref.watch(currentMonthExpensesProvider).take(5).toList();
     final budgetUsage = ref.watch(budgetUsageProvider);
 
     return Scaffold(
@@ -64,8 +65,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       onTap: () => context.push('/profile'),
                       child: CircleAvatar(
                         radius: 22,
-                        backgroundColor: AppColors.primary.withOpacity(0.15),
-                        child: const Icon(Icons.person, color: AppColors.primary),
+                        backgroundColor:
+                            AppColors.primary.withValues(alpha: 0.15),
+                        child:
+                            const Icon(Icons.person, color: AppColors.primary),
                       ),
                     ),
                   ],
@@ -81,7 +84,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.3),
+                        color: AppColors.primary.withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -91,7 +94,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Current Balance',
-                          style: TextStyle(color: Colors.white.withOpacity(0.85))),
+                          style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.85))),
                       const SizedBox(height: 8),
                       Text(
                         Formatters.currency(balance),
@@ -157,10 +161,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 // Budget Progress
                 if (budgetUsage.isNotEmpty) ...[
                   const Text('Budget Progress',
-                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                      style:
+                          TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 12),
                   ...budgetUsage.entries.take(3).map((entry) {
-                    final percent = (entry.value['percent'] ?? 0).clamp(0, 100).toDouble();
+                    final percent =
+                        (entry.value['percent'] ?? 0).clamp(0, 100).toDouble();
                     final over = (entry.value['percent'] ?? 0) >= 100;
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
@@ -171,13 +177,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(entry.key,
-                                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600)),
                                   Text(
                                     '${Formatters.currency(entry.value['spent']!)} / ${Formatters.currency(entry.value['limit']!)}',
-                                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                    style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                        fontSize: 12),
                                   ),
                                 ],
                               ),
@@ -188,7 +198,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                   value: percent / 100,
                                   minHeight: 8,
                                   backgroundColor: Colors.grey.shade200,
-                                  color: over ? AppColors.error : AppColors.primary,
+                                  color: over
+                                      ? AppColors.error
+                                      : AppColors.primary,
                                 ),
                               ),
                             ],
@@ -205,7 +217,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Recent Transactions',
-                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                        style: TextStyle(
+                            fontSize: 17, fontWeight: FontWeight.w600)),
                     TextButton(
                       onPressed: () => context.push('/expenses'),
                       child: const Text('See all'),
@@ -216,7 +229,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 32),
                     child: Center(
-                      child: Text('No transactions yet. Add your first expense!',
+                      child: Text(
+                          'No transactions yet. Add your first expense!',
                           style: TextStyle(color: Colors.grey.shade500)),
                     ),
                   )
@@ -225,17 +239,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         margin: const EdgeInsets.only(bottom: 10),
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: AppColors.primary.withOpacity(0.1),
+                            backgroundColor:
+                                AppColors.primary.withValues(alpha: 0.1),
                             child: Icon(CategoryModel.iconFor(e.category),
                                 color: AppColors.primary, size: 20),
                           ),
-                          title: Text(e.description.isEmpty ? e.category : e.description),
-                          subtitle: Text('${e.category} • ${Formatters.relativeDate(e.date)}'),
+                          title: Text(e.description.isEmpty
+                              ? e.category
+                              : e.description),
+                          subtitle: Text(
+                              '${e.category} • ${Formatters.relativeDate(e.date)}'),
                           trailing: Text(
                             '${e.isIncome ? '+' : '-'}${Formatters.currency(e.amount)}',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: e.isIncome ? AppColors.success : AppColors.error,
+                              color: e.isIncome
+                                  ? AppColors.success
+                                  : AppColors.error,
                             ),
                           ),
                         ),
@@ -270,10 +290,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           }
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt_long_outlined), label: 'Expenses'),
-          BottomNavigationBarItem(icon: Icon(Icons.pie_chart_outline), label: 'Analytics'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings_outlined), label: 'Settings'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_outlined), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long_outlined), label: 'Expenses'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.pie_chart_outline), label: 'Analytics'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings_outlined), label: 'Settings'),
         ],
       ),
     );
@@ -285,7 +309,8 @@ class _MiniStat extends StatelessWidget {
   final String label;
   final String value;
 
-  const _MiniStat({required this.icon, required this.label, required this.value});
+  const _MiniStat(
+      {required this.icon, required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -296,10 +321,14 @@ class _MiniStat extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 11)),
+            Text(label,
+                style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.85), fontSize: 11)),
             Text(value,
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14)),
           ],
         ),
       ],
@@ -312,7 +341,8 @@ class _QuickAction extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _QuickAction({required this.icon, required this.label, required this.onTap});
+  const _QuickAction(
+      {required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -330,7 +360,9 @@ class _QuickAction extends StatelessWidget {
           children: [
             Icon(icon, color: AppColors.primary),
             const SizedBox(height: 6),
-            Text(label, style: const TextStyle(fontSize: 11), textAlign: TextAlign.center),
+            Text(label,
+                style: const TextStyle(fontSize: 11),
+                textAlign: TextAlign.center),
           ],
         ),
       ),

@@ -24,16 +24,21 @@ class ProfileScreen extends ConsumerWidget {
                 children: [
                   CircleAvatar(
                     radius: 44,
-                    backgroundColor: AppColors.primary.withOpacity(0.15),
-                    backgroundImage:
-                        user?.photoUrl != null ? NetworkImage(user!.photoUrl!) : null,
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.15),
+                    backgroundImage: user?.photoUrl != null
+                        ? NetworkImage(user!.photoUrl!)
+                        : null,
                     child: user?.photoUrl == null
-                        ? const Icon(Icons.person, size: 44, color: AppColors.primary)
+                        ? const Icon(Icons.person,
+                            size: 44, color: AppColors.primary)
                         : null,
                   ),
                   const SizedBox(height: 12),
-                  Text(user?.name ?? '', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text(user?.email ?? '', style: TextStyle(color: Colors.grey.shade600)),
+                  Text(user?.name ?? '',
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text(user?.email ?? '',
+                      style: TextStyle(color: Colors.grey.shade600)),
                 ],
               ),
             ),
@@ -51,7 +56,8 @@ class ProfileScreen extends ConsumerWidget {
                     secondary: const Icon(Icons.dark_mode_outlined),
                     title: const Text('Dark Mode'),
                     value: themeMode == ThemeMode.dark,
-                    onChanged: (_) => ref.read(themeModeProvider.notifier).toggle(),
+                    onChanged: (_) =>
+                        ref.read(themeModeProvider.notifier).toggle(),
                   ),
                   const Divider(height: 1),
                   ListTile(
@@ -67,7 +73,8 @@ class ProfileScreen extends ConsumerWidget {
             Card(
               child: ListTile(
                 leading: const Icon(Icons.logout, color: AppColors.error),
-                title: const Text('Logout', style: TextStyle(color: AppColors.error)),
+                title: const Text('Logout',
+                    style: TextStyle(color: AppColors.error)),
                 onTap: () async {
                   await ref.read(authControllerProvider.notifier).logout();
                   if (context.mounted) context.go('/login');

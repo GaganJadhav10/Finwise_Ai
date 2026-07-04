@@ -7,43 +7,66 @@ import '../models/expense_model.dart';
 class ExpenseRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String uid;
-  late final Box _localBox;
 
-  ExpenseRepository({required this.uid}) {
-    _localBox = Hive.box('expenses_$uid');
-  }
+  ExpenseRepository({required this.uid});
 
   CollectionReference get _collection =>
       _firestore.collection('users').doc(uid).collection('expenses');
 
+  /// Opens the local Hive box if it isn't already open.
+  Future<Box> _getBox() async {
+    final boxName = 'expenses_$uid';
+
+    if (Hive.isBoxOpen(boxName)) {
+      return Hive.box(boxName);
+    }
+
+    return await Hive.openBox(boxName);
+  }
+
   Stream<List<ExpenseModel>> watchExpenses() {
     return _collection.orderBy('date', descending: true).snapshots().map(
-        (snap) => snap.docs
-            .map((d) =>
-                ExpenseModel.fromMap(d.data() as Map<String, dynamic>, d.id))
-            .toList());
+          (snap) => snap.docs
+              .map(
+                (d) => ExpenseModel.fromMap(
+                  d.data() as Map<String, dynamic>,
+                  d.id,
+                ),
+              )
+              .toList(),
+        );
   }
 
   Future<List<ExpenseModel>> getExpensesForRange(
-      DateTime start, DateTime end) async {
+    DateTime start,
+    DateTime end,
+  ) async {
     final snap = await _collection
         .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
         .where('date', isLessThanOrEqualTo: Timestamp.fromDate(end))
         .orderBy('date', descending: true)
         .get();
+
     return snap.docs
-        .map((d) => ExpenseModel.fromMap(d.data() as Map<String, dynamic>, d.id))
+        .map(
+          (d) => ExpenseModel.fromMap(
+            d.data() as Map<String, dynamic>,
+            d.id,
+          ),
+        )
         .toList();
   }
 
   Future<String> addExpense(ExpenseModel expense) async {
+    final localBox = await _getBox();
+
     try {
       final doc = await _collection.add(expense.toMap());
       return doc.id;
     } catch (_) {
-      // Offline fallback: queue locally for later sync.
+      // Offline fallback
       final localId = 'local_${DateTime.now().millisecondsSinceEpoch}';
-      await _localBox.put(localId, expense.toMap());
+      await localBox.put(localId, expense.toMap());
       return localId;
     }
   }
@@ -56,12 +79,15 @@ class ExpenseRepository {
     await _collection.doc(id).delete();
   }
 
-  /// Pushes any locally-queued offline expenses to Firestore once online.
+  /// Pushes locally queued expenses to Firestore once online.
   Future<void> syncPendingExpenses() async {
-    final pending = _localBox.toMap();
+    final localBox = await _getBox();
+
+    final pending = localBox.toMap();
+
     for (final entry in pending.entries) {
       await _collection.add(entry.value as Map<String, dynamic>);
-      await _localBox.delete(entry.key);
+      await localBox.delete(entry.key);
     }
   }
 }

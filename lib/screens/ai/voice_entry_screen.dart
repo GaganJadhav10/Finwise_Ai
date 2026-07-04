@@ -26,16 +26,45 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen> {
   Map<String, dynamic>? _parsedExpense;
 
   Future<void> _startListening() async {
-    final available = await _speech.initialize();
-    if (!available) return;
+    debugPrint("🎤 Mic button pressed");
+
+    final available = await _speech.initialize(
+      onStatus: (status) {
+        debugPrint("Speech Status: $status");
+      },
+      onError: (error) {
+        debugPrint("Speech Error: $error");
+      },
+    );
+
+    debugPrint("Speech Available: $available");
+
+    if (!available) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Speech recognition is not available"),
+          ),
+        );
+      }
+      return;
+    }
+
     setState(() {
       _isListening = true;
       _transcript = '';
       _parsedExpense = null;
     });
-    _speech.listen(
+
+    await _speech.listen(
+      localeId: "en_IN",
+      partialResults: true,
       onResult: (result) {
-        setState(() => _transcript = result.recognizedWords);
+        debugPrint("Recognized: ${result.recognizedWords}");
+
+        setState(() {
+          _transcript = result.recognizedWords;
+        });
       },
     );
   }
@@ -64,7 +93,8 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen> {
       paymentMethod: 'Cash',
       createdAt: DateTime.now(),
     );
-    final ok = await ref.read(expenseControllerProvider.notifier).addExpense(expense);
+    final ok =
+        await ref.read(expenseControllerProvider.notifier).addExpense(expense);
     if (ok && mounted) context.pop();
   }
 
@@ -95,7 +125,8 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(_isListening ? 0.5 : 0.3),
+                      color: AppColors.primary
+                          .withValues(alpha: _isListening ? 0.5 : 0.3),
                       blurRadius: _isListening ? 30 : 16,
                       spreadRadius: _isListening ? 6 : 0,
                     ),
@@ -113,13 +144,15 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen> {
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text('"$_transcript"', style: const TextStyle(fontStyle: FontStyle.italic)),
+                  child: Text('"$_transcript"',
+                      style: const TextStyle(fontStyle: FontStyle.italic)),
                 ),
               ),
-            if (_isParsing) const Padding(
-              padding: EdgeInsets.all(20),
-              child: CircularProgressIndicator(),
-            ),
+            if (_isParsing)
+              const Padding(
+                padding: EdgeInsets.all(20),
+                child: CircularProgressIndicator(),
+              ),
             if (_parsedExpense != null) ...[
               const SizedBox(height: 16),
               Card(
@@ -140,7 +173,8 @@ class _VoiceEntryScreenState extends ConsumerState<VoiceEntryScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              GradientButton(label: 'Confirm & Save', onPressed: _confirmAndSave),
+              GradientButton(
+                  label: 'Confirm & Save', onPressed: _confirmAndSave),
             ],
           ],
         ),

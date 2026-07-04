@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
@@ -25,8 +24,8 @@ class PdfService {
           pw.Header(
             level: 0,
             child: pw.Text('FinWise AI - Expense Report',
-                style: pw.TextStyle(
-                    fontSize: 22, fontWeight: pw.FontWeight.bold)),
+                style:
+                    pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold)),
           ),
           pw.Text('Period: $periodLabel'),
           pw.SizedBox(height: 12),
@@ -57,7 +56,8 @@ class PdfService {
     );
 
     final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/finwise_report_${DateTime.now().millisecondsSinceEpoch}.pdf');
+    final file = File(
+        '${dir.path}/finwise_report_${DateTime.now().millisecondsSinceEpoch}.pdf');
     await file.writeAsBytes(await doc.save());
     return file;
   }
@@ -76,7 +76,8 @@ class PdfService {
     ];
     final csvData = const ListToCsvConverter().convert(rows);
     final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/finwise_report_${DateTime.now().millisecondsSinceEpoch}.csv');
+    final file = File(
+        '${dir.path}/finwise_report_${DateTime.now().millisecondsSinceEpoch}.csv');
     await file.writeAsString(csvData);
     return file;
   }

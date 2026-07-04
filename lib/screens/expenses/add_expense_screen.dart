@@ -139,7 +139,8 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                 controller: _amountController,
                 label: 'Amount (₹)',
                 prefixIcon: Icons.currency_rupee,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 validator: Validators.amount,
               ),
               const SizedBox(height: 16),
@@ -157,14 +158,15 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                         ),
                       )
                     : IconButton(
-                        icon: const Icon(Icons.auto_awesome, color: AppColors.primary),
+                        icon: const Icon(Icons.auto_awesome,
+                            color: AppColors.primary),
                         tooltip: 'AI Auto-Categorize',
                         onPressed: _autoCategorize,
                       ),
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _category,
+                initialValue: _category,
                 decoration: const InputDecoration(labelText: 'Category'),
                 items: AppStrings.defaultCategories
                     .map((c) => DropdownMenuItem(value: c, child: Text(c)))
@@ -173,7 +175,7 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _paymentMethod,
+                initialValue: _paymentMethod,
                 decoration: const InputDecoration(labelText: 'Payment Method'),
                 items: AppStrings.paymentMethods
                     .map((m) => DropdownMenuItem(value: m, child: Text(m)))
